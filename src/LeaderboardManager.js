@@ -356,6 +356,10 @@ export class LeaderboardManager {
         if (canvas) {
           canvas.style.pointerEvents = 'auto';
         }
+        // Re-enable keyboard input
+        this.scene.input.keyboard.enabled = true;
+        // Resume the scene
+        this.scene.scene.resume();
         container.destroy();
         // Restart the entire game from level 1
         this.scene.restartFromBeginning();
