@@ -1,0 +1,13 @@
+import Phaser from 'phaser';
+import { LevelGeometry } from './LevelGeometry.js';
+import { FirstLevel } from './FirstLevel.js';
+import { RandomLevelBuilder } from './RandomLevelBuilder.js';
+import { ChallengeDoor } from './entities/ChallengeDoor.js';
+import { QuizChallenge } from './challenges/QuizChallenge.js';
+import { MultipleChoiceQuestion } from './challenges/questions/MultipleChoiceQuestion.js';
+import { CalculationQuestion } from './challenges/questions/CalculationQuestion.js';
+import { ClockQuestion } from './challenges/questions/ClockQuestion.js';
+import { SpellingQuestion } from './challenges/questions/SpellingQuestion.js';
+import { SlimeMonster, SpiderMonster } from './entities/Monster.js';
+import { Projectile } from './entities/Projectile.js';
+import { LeaderboardManager } from './LeaderboardManager.js';

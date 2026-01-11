@@ -6,6 +6,20 @@
 export async function onRequestPost(context) {
   try {
     const { DB } = context.env;
+    
+    // Check if DB binding exists
+    if (!DB) {
+      console.error('DB binding not found in context.env');
+      return new Response(JSON.stringify({ 
+        error: 'Database not configured. Please add D1 binding in Cloudflare Pages settings.' 
+      }), {
+        status: 500,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
     const body = await context.request.json();
     
     const { playerName, completionTime } = body;
