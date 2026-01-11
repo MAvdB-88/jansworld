@@ -368,6 +368,37 @@ class GameScene extends Phaser.Scene {
   }
 
   update() {
+    // Update monsters (always, even during challenges)
+    for (const monster of this.monsters) {
+      monster.update();
+      
+      // Check monster collision with player (only if not in challenge and not invulnerable)
+      if (!this.challengeActive && !this.invulnerable && monster.checkPlayerCollision(this.player)) {
+        // Only damage if this is a different monster than last time
+        if (this.lastHitMonster !== monster) {
+          this.lastHitMonster = monster;
+          this.damagePlayer();
+        }
+      } else if (this.lastHitMonster === monster && !monster.checkPlayerCollision(this.player)) {
+        // Reset tracking when no longer touching this monster
+        this.lastHitMonster = null;
+      }
+    }
+    
+    // Update projectiles (always, even during challenges)
+    for (let i = this.projectiles.length - 1; i >= 0; i--) {
+      const projectile = this.projectiles[i];
+      projectile.update(this.platforms);
+      
+      // Check collision with monsters
+      projectile.checkMonsterCollision(this.monsters);
+      
+      // Remove inactive projectiles
+      if (!projectile.isActive) {
+        this.projectiles.splice(i, 1);
+      }
+    }
+    
     // Skip player control when challenge is active
     if (this.challengeActive) {
       return;
@@ -423,37 +454,6 @@ class GameScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.shootKey) || this.mobileControls.shoot) {
       this.shootProjectile();
       this.mobileControls.shoot = false; // Reset to prevent continuous fire
-    }
-    
-    // Update monsters
-    for (const monster of this.monsters) {
-      monster.update();
-      
-      // Check monster collision with player
-      if (!this.invulnerable && monster.checkPlayerCollision(this.player)) {
-        // Only damage if this is a different monster than last time
-        if (this.lastHitMonster !== monster) {
-          this.lastHitMonster = monster;
-          this.damagePlayer();
-        }
-      } else if (this.lastHitMonster === monster && !monster.checkPlayerCollision(this.player)) {
-        // Reset tracking when no longer touching this monster
-        this.lastHitMonster = null;
-      }
-    }
-    
-    // Update projectiles
-    for (let i = this.projectiles.length - 1; i >= 0; i--) {
-      const projectile = this.projectiles[i];
-      projectile.update(this.platforms);
-      
-      // Check collision with monsters
-      projectile.checkMonsterCollision(this.monsters);
-      
-      // Remove inactive projectiles
-      if (!projectile.isActive) {
-        this.projectiles.splice(i, 1);
-      }
     }
 
     // Check for door collision - only proceed if player has key
