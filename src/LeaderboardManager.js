@@ -102,6 +102,12 @@ export class LeaderboardManager {
     const completionTime = this.completionTime;
     const formattedTime = this.formatTime(completionTime);
 
+    // Pause the scene to stop game updates
+    this.scene.scene.pause();
+    
+    // Disable keyboard input for the game
+    this.scene.input.keyboard.enabled = false;
+
     // Create semi-transparent overlay
     const overlay = this.scene.add.rectangle(
       this.scene.cameras.main.width / 2,
@@ -146,7 +152,7 @@ export class LeaderboardManager {
     inputElement.type = 'text';
     inputElement.placeholder = 'Je naam (optioneel)';
     inputElement.maxLength = 20;
-    inputElement.style.position = 'absolute';
+    inputElement.style.position = 'fixed';
     inputElement.style.left = '50%';
     inputElement.style.top = '50%';
     inputElement.style.transform = 'translate(-50%, -50%)';
@@ -155,8 +161,15 @@ export class LeaderboardManager {
     inputElement.style.width = '300px';
     inputElement.style.textAlign = 'center';
     inputElement.style.zIndex = '10000';
+    inputElement.style.border = '2px solid #00aa00';
+    inputElement.style.borderRadius = '5px';
+    inputElement.style.outline = 'none';
     document.body.appendChild(inputElement);
-    inputElement.focus();
+    
+    // Focus after a small delay to ensure it's rendered
+    setTimeout(() => {
+      inputElement.focus();
+    }, 100);
 
     // Submit button
     const submitButton = this.scene.add.text(centerX, centerY + 50, 'Opslaan', {
@@ -168,7 +181,12 @@ export class LeaderboardManager {
 
     submitButton.on('pointerdown', async () => {
       const playerName = inputElement.value.trim();
-      document.body.removeChild(inputElement);
+      
+      // Remove input and re-enable keyboard
+      if (document.body.contains(inputElement)) {
+        document.body.removeChild(inputElement);
+      }
+      this.scene.input.keyboard.enabled = true;
       
       // Show loading
       submitButton.setText('Opslaan...');
@@ -201,7 +219,11 @@ export class LeaderboardManager {
     }).setOrigin(0.5).setInteractive();
 
     skipButton.on('pointerdown', async () => {
-      document.body.removeChild(inputElement);
+      // Remove input and re-enable keyboard
+      if (document.body.contains(inputElement)) {
+        document.body.removeChild(inputElement);
+      }
+      this.scene.input.keyboard.enabled = true;
       
       // Show leaderboard without saving
       this.showLeaderboard(container, centerX, centerY);
@@ -258,6 +280,8 @@ export class LeaderboardManager {
 
       closeButton.on('pointerdown', () => {
         container.destroy();
+        // Resume the scene (though player will need to restart level)
+        this.scene.scene.resume();
       });
 
       container.add([leaderboardTitle, leaderboardText, closeButton]);
