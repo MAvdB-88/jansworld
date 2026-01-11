@@ -171,29 +171,52 @@ export class LeaderboardManager {
       inputElement.focus();
     }, 100);
 
-    // Submit button
-    const submitButton = this.scene.add.text(centerX, centerY + 50, 'Opslaan', {
-      fontSize: '28px',
-      fill: '#ffffff',
-      backgroundColor: '#00aa00',
-      padding: { x: 20, y: 10 }
-    }).setOrigin(0.5).setInteractive();
+    // Submit button (HTML element)
+    const submitButton = document.createElement('button');
+    submitButton.textContent = 'Opslaan';
+    submitButton.style.position = 'fixed';
+    submitButton.style.left = '50%';
+    submitButton.style.top = 'calc(50% + 80px)';
+    submitButton.style.transform = 'translateX(-50%)';
+    submitButton.style.padding = '12px 30px';
+    submitButton.style.fontSize = '24px';
+    submitButton.style.backgroundColor = '#00aa00';
+    submitButton.style.color = '#ffffff';
+    submitButton.style.border = 'none';
+    submitButton.style.borderRadius = '5px';
+    submitButton.style.cursor = 'pointer';
+    submitButton.style.zIndex = '10001';
+    submitButton.style.fontWeight = 'bold';
+    document.body.appendChild(submitButton);
 
-    submitButton.on('pointerdown', async () => {
+    submitButton.onclick = async () => {
       const playerName = inputElement.value.trim();
       
-      // Remove input and re-enable keyboard
+      // Remove input and buttons
       if (document.body.contains(inputElement)) {
         document.body.removeChild(inputElement);
       }
-      this.scene.input.keyboard.enabled = true;
       
       // Show loading
-      submitButton.setText('Opslaan...');
-      submitButton.disableInteractive();
+      submitButton.textContent = 'Opslaan...';
+      submitButton.disabled = true;
+      submitButton.style.opacity = '0.6';
+      submitButton.style.cursor = 'not-allowed';
 
       try {
         await this.saveScore(playerName, completionTime);
+        
+        // Remove HTML buttons
+        if (document.body.contains(submitButton)) {
+          document.body.removeChild(submitButton);
+        }
+        const skipBtn = document.getElementById('skipLeaderboardBtn');
+        if (skipBtn && document.body.contains(skipBtn)) {
+          document.body.removeChild(skipBtn);
+        }
+        
+        // Re-enable keyboard
+        this.scene.input.keyboard.enabled = true;
         
         // Show leaderboard
         this.showLeaderboard(container, centerX, centerY);
@@ -202,27 +225,46 @@ export class LeaderboardManager {
         title.destroy();
         timeText.destroy();
         promptText.destroy();
-        submitButton.destroy();
       } catch (error) {
         alert('Fout bij opslaan score. Probeer opnieuw.');
-        submitButton.setText('Opslaan');
-        submitButton.setInteractive();
+        submitButton.textContent = 'Opslaan';
+        submitButton.disabled = false;
+        submitButton.style.opacity = '1';
+        submitButton.style.cursor = 'pointer';
       }
-    });
+    };
 
-    // Skip button
-    const skipButton = this.scene.add.text(centerX, centerY + 100, 'Overslaan', {
-      fontSize: '24px',
-      fill: '#cccccc',
-      backgroundColor: '#444444',
-      padding: { x: 15, y: 8 }
-    }).setOrigin(0.5).setInteractive();
+    // Skip button (HTML element)
+    const skipButton = document.createElement('button');
+    skipButton.id = 'skipLeaderboardBtn';
+    skipButton.textContent = 'Overslaan';
+    skipButton.style.position = 'fixed';
+    skipButton.style.left = '50%';
+    skipButton.style.top = 'calc(50% + 140px)';
+    skipButton.style.transform = 'translateX(-50%)';
+    skipButton.style.padding = '10px 25px';
+    skipButton.style.fontSize = '20px';
+    skipButton.style.backgroundColor = '#555555';
+    skipButton.style.color = '#cccccc';
+    skipButton.style.border = 'none';
+    skipButton.style.borderRadius = '5px';
+    skipButton.style.cursor = 'pointer';
+    skipButton.style.zIndex = '10001';
+    document.body.appendChild(skipButton);
 
-    skipButton.on('pointerdown', async () => {
-      // Remove input and re-enable keyboard
+    skipButton.onclick = async () => {
+      // Remove input and buttons
       if (document.body.contains(inputElement)) {
         document.body.removeChild(inputElement);
       }
+      if (document.body.contains(submitButton)) {
+        document.body.removeChild(submitButton);
+      }
+      if (document.body.contains(skipButton)) {
+        document.body.removeChild(skipButton);
+      }
+      
+      // Re-enable keyboard
       this.scene.input.keyboard.enabled = true;
       
       // Show leaderboard without saving
@@ -232,11 +274,9 @@ export class LeaderboardManager {
       title.destroy();
       timeText.destroy();
       promptText.destroy();
-      submitButton.destroy();
-      skipButton.destroy();
-    });
+    };
 
-    container.add([overlay, title, timeText, promptText, submitButton, skipButton]);
+    container.add([overlay, title, timeText, promptText]);
 
     return container;
   }
@@ -270,21 +310,35 @@ export class LeaderboardManager {
         lineSpacing: 10
       }).setOrigin(0.5);
 
-      // Close button
-      const closeButton = this.scene.add.text(centerX, centerY + 180, 'Sluiten', {
-        fontSize: '28px',
-        fill: '#ffffff',
-        backgroundColor: '#aa0000',
-        padding: { x: 20, y: 10 }
-      }).setOrigin(0.5).setInteractive();
+      // Close button (HTML element)
+      const closeButton = document.createElement('button');
+      closeButton.textContent = 'Sluiten';
+      closeButton.style.position = 'fixed';
+      closeButton.style.left = '50%';
+      closeButton.style.top = 'calc(50% + 220px)';
+      closeButton.style.transform = 'translateX(-50%)';
+      closeButton.style.padding = '12px 30px';
+      closeButton.style.fontSize = '24px';
+      closeButton.style.backgroundColor = '#aa0000';
+      closeButton.style.color = '#ffffff';
+      closeButton.style.border = 'none';
+      closeButton.style.borderRadius = '5px';
+      closeButton.style.cursor = 'pointer';
+      closeButton.style.zIndex = '10001';
+      closeButton.style.fontWeight = 'bold';
+      document.body.appendChild(closeButton);
 
-      closeButton.on('pointerdown', () => {
+      closeButton.onclick = () => {
+        // Remove button
+        if (document.body.contains(closeButton)) {
+          document.body.removeChild(closeButton);
+        }
         container.destroy();
         // Resume the scene (though player will need to restart level)
         this.scene.scene.resume();
-      });
+      };
 
-      container.add([leaderboardTitle, leaderboardText, closeButton]);
+      container.add([leaderboardTitle, leaderboardText]);
     } catch (error) {
       const errorText = this.scene.add.text(centerX, centerY, 'Fout bij laden leaderboard', {
         fontSize: '24px',
