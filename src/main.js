@@ -40,8 +40,8 @@ class GameScene extends Phaser.Scene {
     // Load monster sprites
     this.load.image('slimeWalk1', 'sprites/Extra animations and enemies/Enemy sprites/slimeGreen.png');
     this.load.image('slimeWalk2', 'sprites/Extra animations and enemies/Enemy sprites/slimeGreen_walk.png');
-    this.load.image('spiderWalk1', 'sprites/Extra animations and enemies/Enemy sprites/spider.png');
-    this.load.image('spiderWalk2', 'sprites/Extra animations and enemies/Enemy sprites/spider_walk.png');
+    this.load.image('spiderWalk1', 'sprites/Extra animations and enemies/Enemy sprites/spider_walk1.png');
+    this.load.image('spiderWalk2', 'sprites/Extra animations and enemies/Enemy sprites/spider_walk2.png');
     
     // Load projectile sprite
     this.load.image('projectile', 'sprites/Base pack/Items/fireball.png');
