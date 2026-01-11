@@ -43,7 +43,7 @@ class GameScene extends Phaser.Scene {
     this.load.image('spiderWalk2', 'sprites/Extra animations and enemies/Enemy sprites/spider_walk.png');
     
     // Load projectile sprite
-    this.load.image('projectile', 'sprites/Base pack/Items/star.png');
+    this.load.image('projectile', 'sprites/Base pack/Items/fireball.png');
   }
 
   create() {
@@ -879,8 +879,8 @@ class GameScene extends Phaser.Scene {
       }
     });
 
-    // Shoot button (lower right corner, second from right)
-    const shootButtonX = gameWidth - buttonMargin - buttonSize / 2;
+    // Shoot button (lower left corner, next to right button)
+    const shootButtonX = rightButtonX + buttonSize + 20;
     this.shootButton = this.add.rectangle(shootButtonX, buttonY, buttonSize, buttonSize, 0xff4444, 0.7);
     this.shootButton.setScrollFactor(0);
     this.shootButton.setInteractive();
@@ -917,8 +917,8 @@ class GameScene extends Phaser.Scene {
       }
     });
 
-    // Jump button (lower right corner, next to shoot button)
-    const jumpButtonX = shootButtonX - buttonSize - 20;
+    // Jump button (lower right corner)
+    const jumpButtonX = gameWidth - buttonMargin - buttonSize / 2;
     this.jumpButton = this.add.rectangle(jumpButtonX, buttonY, buttonSize, buttonSize, 0x444444, 0.7);
     this.jumpButton.setScrollFactor(0);
     this.jumpButton.setInteractive();

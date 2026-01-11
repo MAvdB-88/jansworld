@@ -66,8 +66,8 @@ export class FirstLevel extends LevelBuilder {
     ];
 
     // Set player start position (on the ground initially)
-    levelGeometry.startX = 50;
-    levelGeometry.startY = 2000;
+    levelGeometry.startX = 1900;
+    levelGeometry.startY = 250;
 
     // Set door position
     levelGeometry.doorX = 2800;
@@ -188,12 +188,19 @@ export class FirstLevel extends LevelBuilder {
       { x: 2000, y: 1350, type: 'slime', platformWidth: 500 }, // Op platform na teleporter
       { x: 2800, y: 750, type: 'slime', platformWidth: 200 },  // Op platform voor eindconsole
       { x: 600, y: 830, type: 'slime', platformWidth: 100 },   // Op stairway platform
+      { x: 800, y: 720, type: 'slime', platformWidth: 100 },   // Op stairway platform
+      { x: 1000, y: 610, type: 'slime', platformWidth: 100 },  // Op stairway platform
+      { x: 1400, y: 390, type: 'slime', platformWidth: 100 },  // Op stairway platform
       { x: 2380, y: 1050, type: 'slime', platformWidth: 200 }, // Op klimsectie rechts
-      { x: 2140, y: 300, type: 'slime', platformWidth: 140 },  // Op stairway to heaven (smaller patrol area)
+      { x: 2520, y: 950, type: 'slime', platformWidth: 200 },  // Op klimsectie rechts
+      { x: 2660, y: 850, type: 'slime', platformWidth: 200 },  // Op klimsectie rechts
+      { x: 2140, y: 300, type: 'slime', platformWidth: 140 },  // Op stairway to heaven
+      { x: 2280, y: 250, type: 'slime', platformWidth: 140 },  // Op stairway to heaven
+      { x: 2560, y: 150, type: 'slime', platformWidth: 140 },  // Op stairway to heaven
       
       // Spin monsters (immortal) - kunnen niet dood
       { x: 100, y: 1450, type: 'spider', platformWidth: 300 }, // Op platform na moeilijke sprong
-      { x: 2420, y: 200, type: 'spider', platformWidth: 140 }  // Op stairway to heaven (smaller patrol area)
+      { x: 2420, y: 200, type: 'spider', platformWidth: 140 }  // Op stairway to heaven
     ];
   }
 }
