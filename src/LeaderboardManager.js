@@ -107,6 +107,12 @@ export class LeaderboardManager {
     
     // Disable keyboard input for the game
     this.scene.input.keyboard.enabled = false;
+    
+    // Make canvas not block pointer events for HTML elements
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      canvas.style.pointerEvents = 'none';
+    }
 
     // Create semi-transparent overlay
     const overlay = this.scene.add.rectangle(
@@ -185,8 +191,10 @@ export class LeaderboardManager {
     submitButton.style.border = 'none';
     submitButton.style.borderRadius = '5px';
     submitButton.style.cursor = 'pointer';
-    submitButton.style.zIndex = '10001';
+    submitButton.style.zIndex = '999999';
     submitButton.style.fontWeight = 'bold';
+    submitButton.style.pointerEvents = 'auto';
+    submitButton.style.userSelect = 'none';
     document.body.appendChild(submitButton);
 
     submitButton.onclick = async () => {
@@ -249,7 +257,9 @@ export class LeaderboardManager {
     skipButton.style.border = 'none';
     skipButton.style.borderRadius = '5px';
     skipButton.style.cursor = 'pointer';
-    skipButton.style.zIndex = '10001';
+    skipButton.style.zIndex = '999999';
+    skipButton.style.pointerEvents = 'auto';
+    skipButton.style.userSelect = 'none';
     document.body.appendChild(skipButton);
 
     skipButton.onclick = async () => {
@@ -262,6 +272,12 @@ export class LeaderboardManager {
       }
       if (document.body.contains(skipButton)) {
         document.body.removeChild(skipButton);
+      }
+      
+      // Restore canvas pointer events
+      const canvas = document.querySelector('canvas');
+      if (canvas) {
+        canvas.style.pointerEvents = 'auto';
       }
       
       // Re-enable keyboard
@@ -324,14 +340,21 @@ export class LeaderboardManager {
       closeButton.style.border = 'none';
       closeButton.style.borderRadius = '5px';
       closeButton.style.cursor = 'pointer';
-      closeButton.style.zIndex = '10001';
+      closeButton.style.zIndex = '999999';
       closeButton.style.fontWeight = 'bold';
+      closeButton.style.pointerEvents = 'auto';
+      closeButton.style.userSelect = 'none';
       document.body.appendChild(closeButton);
 
       closeButton.onclick = () => {
         // Remove button
         if (document.body.contains(closeButton)) {
           document.body.removeChild(closeButton);
+        }
+        // Restore canvas pointer events
+        const canvas = document.querySelector('canvas');
+        if (canvas) {
+          canvas.style.pointerEvents = 'auto';
         }
         container.destroy();
         // Resume the scene (though player will need to restart level)
