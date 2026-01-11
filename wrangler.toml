@@ -1,0 +1,8 @@
+name = "jansworld"
+compatibility_date = "2026-01-11"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "jansworld-db"
+database_id = "dcfd3307-6e26-40cb-853e-fd9d52dd3356"

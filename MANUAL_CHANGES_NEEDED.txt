@@ -1,0 +1,40 @@
+## MANUAL CHANGES REQUIRED IN src/main.js
+
+Please make these 3 changes to integrate the leaderboard:
+
+### Change 1: Add import (line 12)
+Add this line after line 12 (after `import { Projectile } from './entities/Projectile.js';`):
+```javascript
+import { LeaderboardManager } from './LeaderboardManager.js';
+```
+
+### Change 2: Initialize leaderboard manager (line ~196)
+After line 196 (`this.createHealthUI();`), add these lines:
+```javascript
+    
+    // Initialize leaderboard manager and start timer
+    this.leaderboardManager = new LeaderboardManager(this);
+    if (this.currentLevel === 1) {
+      this.leaderboardManager.startTimer();
+    }
+```
+
+### Change 3: Update nextLevel() method (line 199)
+Replace the current nextLevel() method (lines 199-207) with:
+```javascript
+  nextLevel() {
+    // Stop timer and show leaderboard for level 1
+    if (this.currentLevel === 1 && this.leaderboardManager) {
+      this.leaderboardManager.stopTimer();
+      this.leaderboardManager.showCompletionUI();
+    } else {
+      // For future levels, show finished animation
+      this.showFinishedAnimation();
+    }
+    
+    /* Original nextLevel code - temporarily disabled
+```
+
+Keep everything else the same!
+
+After making these changes, commit and push to deploy.
