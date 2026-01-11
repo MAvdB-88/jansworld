@@ -1090,6 +1090,22 @@ class GameScene extends Phaser.Scene {
   }
   
   /**
+   * Restart the entire game from level 1 - complete reset
+   */
+  restartFromBeginning() {
+    // Reset to level 1
+    this.currentLevel = 1;
+    
+    // Restart the timer
+    if (this.leaderboardManager) {
+      this.leaderboardManager.startTimer();
+    }
+    
+    // Call the existing restart logic
+    this.restartLevel();
+  }
+  
+  /**
    * Restart the current level - reset all progress
    */
   restartLevel() {

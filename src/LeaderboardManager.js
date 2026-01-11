@@ -326,30 +326,30 @@ export class LeaderboardManager {
         lineSpacing: 10
       }).setOrigin(0.5);
 
-      // Close button (HTML element)
-      const closeButton = document.createElement('button');
-      closeButton.textContent = 'Sluiten';
-      closeButton.style.position = 'fixed';
-      closeButton.style.left = '50%';
-      closeButton.style.top = 'calc(50% + 220px)';
-      closeButton.style.transform = 'translateX(-50%)';
-      closeButton.style.padding = '12px 30px';
-      closeButton.style.fontSize = '24px';
-      closeButton.style.backgroundColor = '#aa0000';
-      closeButton.style.color = '#ffffff';
-      closeButton.style.border = 'none';
-      closeButton.style.borderRadius = '5px';
-      closeButton.style.cursor = 'pointer';
-      closeButton.style.zIndex = '999999';
-      closeButton.style.fontWeight = 'bold';
-      closeButton.style.pointerEvents = 'auto';
-      closeButton.style.userSelect = 'none';
-      document.body.appendChild(closeButton);
+      // Restart button (HTML element)
+      const restartButton = document.createElement('button');
+      restartButton.textContent = 'Restart';
+      restartButton.style.position = 'fixed';
+      restartButton.style.left = '50%';
+      restartButton.style.top = 'calc(50% + 220px)';
+      restartButton.style.transform = 'translateX(-50%)';
+      restartButton.style.padding = '12px 30px';
+      restartButton.style.fontSize = '24px';
+      restartButton.style.backgroundColor = '#0066cc';
+      restartButton.style.color = '#ffffff';
+      restartButton.style.border = 'none';
+      restartButton.style.borderRadius = '5px';
+      restartButton.style.cursor = 'pointer';
+      restartButton.style.zIndex = '999999';
+      restartButton.style.fontWeight = 'bold';
+      restartButton.style.pointerEvents = 'auto';
+      restartButton.style.userSelect = 'none';
+      document.body.appendChild(restartButton);
 
-      closeButton.onclick = () => {
+      restartButton.onclick = () => {
         // Remove button
-        if (document.body.contains(closeButton)) {
-          document.body.removeChild(closeButton);
+        if (document.body.contains(restartButton)) {
+          document.body.removeChild(restartButton);
         }
         // Restore canvas pointer events
         const canvas = document.querySelector('canvas');
@@ -357,8 +357,8 @@ export class LeaderboardManager {
           canvas.style.pointerEvents = 'auto';
         }
         container.destroy();
-        // Resume the scene (though player will need to restart level)
-        this.scene.scene.resume();
+        // Restart the entire game from level 1
+        this.scene.restartFromBeginning();
       };
 
       container.add([leaderboardTitle, leaderboardText]);

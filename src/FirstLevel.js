@@ -199,8 +199,8 @@ export class FirstLevel extends LevelBuilder {
       { x: 2560, y: 150, type: 'slime', platformWidth: 140 },  // Op stairway to heaven
       
       // Spin monsters (immortal) - kunnen niet dood
-      { x: 100, y: 1450, type: 'spider', platformWidth: 300 }, // Op platform na moeilijke sprong
-      { x: 2420, y: 200, type: 'spider', platformWidth: 140 }  // Op stairway to heaven
+      { x: 100, y: 1420, type: 'spider', platformWidth: 300 }, // Op platform na moeilijke sprong
+      { x: 2420, y: 180, type: 'spider', platformWidth: 140 }  // Op stairway to heaven
     ];
   }
 }

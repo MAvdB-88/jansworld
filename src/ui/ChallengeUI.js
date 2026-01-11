@@ -224,7 +224,7 @@ export class ChallengeUI {
       this.inputElement.style.width = `${inputWidth * scaleX}px`;
       this.inputElement.style.height = `${inputHeight * scaleY}px`;
       // Min 16px to prevent iOS zoom, max 24px to prevent huge text on PC
-      this.inputElement.style.fontSize = `${Math.min(10, Math.max(16, 20 * scaleY))}px`;
+      this.inputElement.style.fontSize = `${Math.min(24, Math.max(16, 20 * scaleY))}px`;
     };
     
     // Initial positioning with double RAF for Safari reliability

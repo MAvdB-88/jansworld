@@ -148,6 +148,10 @@ export class SpiderMonster extends Monster {
     this.sprite.body.setGravityY(800);
     this.sprite.setTint(0x8800ff); // Purple tint to distinguish from slimes
     
+    // Adjust body size to match actual sprite
+    this.sprite.body.setSize(this.sprite.width * 0.7, this.sprite.height * 0.8);
+    this.sprite.body.setOffset(this.sprite.width * 0.15, this.sprite.height * 0.2);
+    
     // Create walk animation
     if (!this.scene.anims.exists('spider-walk')) {
       this.scene.anims.create({
@@ -162,6 +166,27 @@ export class SpiderMonster extends Monster {
     }
     
     this.sprite.play('spider-walk');
+  }
+
+  /**
+   * Override update to use larger edge margin for spiders
+   */
+  update() {
+    if (!this.sprite || !this.isAlive) return;
+
+    // Move in current direction
+    this.sprite.body.setVelocityX(this.direction * this.speed);
+
+    // Check platform edges - larger margin for spiders due to body offset
+    const edgeMargin = 50;
+    if (this.direction === 1 && this.sprite.x > this.platformEndX - edgeMargin) {
+      this.reverseDirection();
+    } else if (this.direction === -1 && this.sprite.x < this.platformStartX + edgeMargin) {
+      this.reverseDirection();
+    }
+
+    // Flip sprite based on direction
+    this.sprite.flipX = this.direction === -1;
   }
 
   takeDamage() {
