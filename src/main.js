@@ -82,6 +82,7 @@ class GameScene extends Phaser.Scene {
     this.playerLives = 3;
     this.playerMaxLives = 3;
     this.invulnerable = false;
+    this.lastHitMonster = null;
     
     // Monsters and projectiles
     this.monsters = [];
@@ -169,14 +170,16 @@ class GameScene extends Phaser.Scene {
       left: false,
       right: false,
       jump: false,
-      jumpRequested: false  // Persists until jump is executed
+      jumpRequested: false,  // Persists until jump is executed
+      shoot: false
     };
 
     // Track active pointers for each button to handle multi-touch properly
     this.activePointers = {
       left: new Set(),
       right: new Set(),
-      jump: new Set()
+      jump: new Set(),
+      shoot: new Set()
     };
 
     // Track if space was pressed (for edge-triggered jump)
@@ -416,9 +419,10 @@ class GameScene extends Phaser.Scene {
       this.player.anims.play('jump', true);
     }
     
-    // Handle shooting
-    if (Phaser.Input.Keyboard.JustDown(this.shootKey)) {
+    // Handle shooting - keyboard or mobile
+    if (Phaser.Input.Keyboard.JustDown(this.shootKey) || this.mobileControls.shoot) {
       this.shootProjectile();
+      this.mobileControls.shoot = false; // Reset to prevent continuous fire
     }
     
     // Update monsters
@@ -427,7 +431,14 @@ class GameScene extends Phaser.Scene {
       
       // Check monster collision with player
       if (!this.invulnerable && monster.checkPlayerCollision(this.player)) {
-        this.damagePlayer();
+        // Only damage if this is a different monster than last time
+        if (this.lastHitMonster !== monster) {
+          this.lastHitMonster = monster;
+          this.damagePlayer();
+        }
+      } else if (this.lastHitMonster === monster && !monster.checkPlayerCollision(this.player)) {
+        // Reset tracking when no longer touching this monster
+        this.lastHitMonster = null;
       }
     }
     
@@ -868,8 +879,46 @@ class GameScene extends Phaser.Scene {
       }
     });
 
-    // Jump button (lower right corner)
-    const jumpButtonX = gameWidth - buttonMargin - buttonSize / 2;
+    // Shoot button (lower right corner, second from right)
+    const shootButtonX = gameWidth - buttonMargin - buttonSize / 2;
+    this.shootButton = this.add.rectangle(shootButtonX, buttonY, buttonSize, buttonSize, 0xff4444, 0.7);
+    this.shootButton.setScrollFactor(0);
+    this.shootButton.setInteractive();
+    this.shootButton.setDepth(100);
+    
+    const shootText = this.add.text(shootButtonX, buttonY, '🔫', {
+      fontSize: '48px',
+      fill: '#ffffff'
+    }).setOrigin(0.5);
+    shootText.setScrollFactor(0);
+    shootText.setDepth(101);
+
+    this.shootButton.on('pointerdown', (pointer) => {
+      this.activePointers.shoot.add(pointer.id);
+      this.mobileControls.shoot = true;
+      this.shootButton.setFillStyle(0xff6666, 0.9);
+    });
+    this.shootButton.on('pointerup', (pointer) => {
+      this.activePointers.shoot.delete(pointer.id);
+      if (this.activePointers.shoot.size === 0) {
+        this.shootButton.setFillStyle(0xff4444, 0.7);
+      }
+    });
+    this.shootButton.on('pointerout', (pointer) => {
+      this.activePointers.shoot.delete(pointer.id);
+      if (this.activePointers.shoot.size === 0) {
+        this.shootButton.setFillStyle(0xff4444, 0.7);
+      }
+    });
+    this.shootButton.on('pointerupoutside', (pointer) => {
+      this.activePointers.shoot.delete(pointer.id);
+      if (this.activePointers.shoot.size === 0) {
+        this.shootButton.setFillStyle(0xff4444, 0.7);
+      }
+    });
+
+    // Jump button (lower right corner, next to shoot button)
+    const jumpButtonX = shootButtonX - buttonSize - 20;
     this.jumpButton = this.add.rectangle(jumpButtonX, buttonY, buttonSize, buttonSize, 0x444444, 0.7);
     this.jumpButton.setScrollFactor(0);
     this.jumpButton.setInteractive();
@@ -944,7 +993,7 @@ class GameScene extends Phaser.Scene {
     const heartSize = 40;
     const spacing = 45;
     const startX = this.cameras.main.width - (this.playerMaxLives * spacing) - 10;
-    const startY = 60;
+    const startY = 100;
     
     for (let i = 0; i < this.playerMaxLives; i++) {
       const heart = this.add.text(startX + (i * spacing), startY, '❤️', {
@@ -1022,6 +1071,7 @@ class GameScene extends Phaser.Scene {
         this.invulnerable = false;
         this.player.clearTint();
         this.player.alpha = 1;
+        this.lastHitMonster = null;
       });
     }
   }
@@ -1061,6 +1111,7 @@ class GameScene extends Phaser.Scene {
     // Reset player state
     this.playerLives = this.playerMaxLives;
     this.invulnerable = false;
+    this.lastHitMonster = null;
     this.player.clearTint();
     this.player.alpha = 1;
     

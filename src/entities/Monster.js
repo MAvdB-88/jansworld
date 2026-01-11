@@ -111,6 +111,7 @@ export class Monster {
  */
 export class SlimeMonster extends Monster {
   create() {
+    this.speed = 150; // Faster than default
     this.sprite = this.scene.physics.add.sprite(this.x, this.y, 'slimeWalk1');
     this.sprite.setScale(0.8);
     this.sprite.body.setGravityY(800);
