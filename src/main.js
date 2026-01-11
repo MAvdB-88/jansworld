@@ -1071,7 +1071,7 @@ class GameScene extends Phaser.Scene {
         this.invulnerable = false;
         this.player.clearTint();
         this.player.alpha = 1;
-        this.lastHitMonster = null;
+        // Don't reset lastHitMonster here - it will reset when player stops touching the monster
       });
     }
   }

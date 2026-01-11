@@ -66,8 +66,8 @@ export class FirstLevel extends LevelBuilder {
     ];
 
     // Set player start position (on the ground initially)
-    levelGeometry.startX = 1900;
-    levelGeometry.startY = 250;
+    levelGeometry.startX = 50;
+    levelGeometry.startY = 2200;
 
     // Set door position
     levelGeometry.doorX = 2800;
