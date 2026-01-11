@@ -20,7 +20,7 @@ export class FirstLevel extends LevelBuilder {
 
     // Hard-coded platforms for first level
     // Create a simple, learnable path to the exit
-    levelGeometry.platforms = [  
+    levelGeometry.platforms = [
       { x: 350, y: 2100, width: 500 },
       //Difficult jumps
       { x: 550, y: 1900, width: 70 },
@@ -51,7 +51,7 @@ export class FirstLevel extends LevelBuilder {
       { x: 2920, y: 700, width: 100 },
 
       { x: 2950, y: 1000, width: 100 },
-      
+
       //Platform with teleporter
       { x: 2920, y: 1300, width: 100 },
 
@@ -88,6 +88,32 @@ export class FirstLevel extends LevelBuilder {
         challengeType: 'quiz',
         challengeData: {
           questions: [
+            // Nog een multiple choice
+            {
+              type: 'multipleChoice',
+              question: 'Hoe steek je een kaars aan zonder lucifer of aansteker?',
+              options: ['Een draak als huisdier nemen', 'Een scheet in de brand steken', 'Een andere kaars gebruiken', 'De kaars in de magentron stoppen'],
+              correctIndex: 0
+            },
+            // Rekenvraag
+            {
+              type: 'calculation',
+              question: 'Hoeveel is 999 X 1000?',
+              answer: 999000
+            },
+            // Spelling vraag
+            {
+              type: 'spelling',
+              image: '',
+              answer: 'Piet',
+              hint: 'De vader van Piet heeft 4 kinderen: Jan, Gijs, Klaas. Hoe heet het vierde kind?'
+            },
+            {
+              type: 'multipleChoice',
+              question: 'Van welke band is Jan fan?',
+              options: ['Kinderen voor kinderen', 'Iron Maiden', 'Snollebollekes', 'Metallica'],
+              correctIndex: 3
+            },
             // Multiple choice vraag
             {
               type: 'multipleChoice',
@@ -127,7 +153,7 @@ export class FirstLevel extends LevelBuilder {
             // Multiple choice vraag
             {
               type: 'multipleChoice',
-              question: 'Kan je vuur onder water maken?',
+              question: 'Kan je vuur maken onder water?',
               options: ['Ja', 'Nee'],
               correctIndex: 0
             },
