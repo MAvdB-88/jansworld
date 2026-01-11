@@ -10,6 +10,7 @@ import { ClockQuestion } from './challenges/questions/ClockQuestion.js';
 import { SpellingQuestion } from './challenges/questions/SpellingQuestion.js';
 import { SlimeMonster, SpiderMonster } from './entities/Monster.js';
 import { Projectile } from './entities/Projectile.js';
+import { LeaderboardManager } from './LeaderboardManager.js';
 
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -194,11 +195,23 @@ class GameScene extends Phaser.Scene {
     
     // Create health UI
     this.createHealthUI();
+    
+    // Initialize leaderboard manager and start timer
+    this.leaderboardManager = new LeaderboardManager(this);
+    if (this.currentLevel === 1) {
+      this.leaderboardManager.startTimer();
+    }
   }
 
   nextLevel() {
-    // Temporarily show finished animation instead of going to next level
-    this.showFinishedAnimation();
+    // Stop timer and show leaderboard for level 1
+    if (this.currentLevel === 1 && this.leaderboardManager) {
+      this.leaderboardManager.stopTimer();
+      this.leaderboardManager.showCompletionUI();
+    } else {
+      // For future levels, show finished animation
+      this.showFinishedAnimation();
+    }
     return;
     
     /* Original nextLevel code - temporarily disabled
