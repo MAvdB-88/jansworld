@@ -8,6 +8,8 @@ import { MultipleChoiceQuestion } from './challenges/questions/MultipleChoiceQue
 import { CalculationQuestion } from './challenges/questions/CalculationQuestion.js';
 import { ClockQuestion } from './challenges/questions/ClockQuestion.js';
 import { SpellingQuestion } from './challenges/questions/SpellingQuestion.js';
+import { SlimeMonster, SpiderMonster } from './entities/Monster.js';
+import { Projectile } from './entities/Projectile.js';
 
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -33,6 +35,15 @@ class GameScene extends Phaser.Scene {
     
     // Load key sprite
     this.load.image('keyYellow', 'sprites/Base pack/Items/keyYellow.png');
+    
+    // Load monster sprites
+    this.load.image('slimeWalk1', 'sprites/Extra animations and enemies/Enemy sprites/slimeGreen.png');
+    this.load.image('slimeWalk2', 'sprites/Extra animations and enemies/Enemy sprites/slimeGreen_walk.png');
+    this.load.image('spiderWalk1', 'sprites/Extra animations and enemies/Enemy sprites/spider.png');
+    this.load.image('spiderWalk2', 'sprites/Extra animations and enemies/Enemy sprites/spider_walk.png');
+    
+    // Load projectile sprite
+    this.load.image('projectile', 'sprites/Base pack/Items/star.png');
   }
 
   create() {
@@ -66,6 +77,15 @@ class GameScene extends Phaser.Scene {
     this.completedChallenges = 0;
     this.totalChallenges = 0;
     this.keySprite = null;  // Physical key sprite in the level
+    
+    // Player lives system
+    this.playerLives = 3;
+    this.playerMaxLives = 3;
+    this.invulnerable = false;
+    
+    // Monsters and projectiles
+    this.monsters = [];
+    this.projectiles = [];
 
     // Create challenge doors
     this.createChallengeDoors();
@@ -129,7 +149,7 @@ class GameScene extends Phaser.Scene {
       });
       this.text.setScrollFactor(0); // Keep text fixed to camera
     } else {
-      this.text = this.add.text(10, 10, `Level ${this.currentLevel}\nPijltjestoetsen om te bewegen, Spatiebalk om te springen`, {
+      this.text = this.add.text(10, 10, `Level ${this.currentLevel}\nPijltjestoetsen = bewegen, Spatie = springen, X = schieten`, {
         fontSize: '24px',
         fill: '#ffffff'
       });
@@ -139,6 +159,7 @@ class GameScene extends Phaser.Scene {
     // Setup keyboard controls
     this.cursors = this.input.keyboard.createCursorKeys();
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.shootKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
 
     this.moveSpeed = 200;
     this.jumpVelocity = -600;
@@ -164,6 +185,12 @@ class GameScene extends Phaser.Scene {
     if (this.isMobile) {
       this.createMobileButtons();
     }
+    
+    // Create monsters
+    this.createMonsters();
+    
+    // Create health UI
+    this.createHealthUI();
   }
 
   nextLevel() {
@@ -387,6 +414,35 @@ class GameScene extends Phaser.Scene {
     // Play jump animation when in air
     if (!this.player.body.touching.down && this.player.anims.currentAnim?.key !== 'jump') {
       this.player.anims.play('jump', true);
+    }
+    
+    // Handle shooting
+    if (Phaser.Input.Keyboard.JustDown(this.shootKey)) {
+      this.shootProjectile();
+    }
+    
+    // Update monsters
+    for (const monster of this.monsters) {
+      monster.update();
+      
+      // Check monster collision with player
+      if (!this.invulnerable && monster.checkPlayerCollision(this.player)) {
+        this.damagePlayer();
+      }
+    }
+    
+    // Update projectiles
+    for (let i = this.projectiles.length - 1; i >= 0; i--) {
+      const projectile = this.projectiles[i];
+      projectile.update(this.platforms);
+      
+      // Check collision with monsters
+      projectile.checkMonsterCollision(this.monsters);
+      
+      // Remove inactive projectiles
+      if (!projectile.isActive) {
+        this.projectiles.splice(i, 1);
+      }
     }
 
     // Check for door collision - only proceed if player has key
@@ -853,6 +909,180 @@ class GameScene extends Phaser.Scene {
         this.jumpButton.setFillStyle(0x444444, 0.7);
       }
     });
+  }
+  
+  /**
+   * Create monsters from level geometry
+   */
+  createMonsters() {
+    const monsterData = this.levelGeometry.getMonsters();
+    this.monsters = [];
+    
+    for (const data of monsterData) {
+      let monster;
+      if (data.type === 'slime') {
+        monster = new SlimeMonster(this, data.x, data.y, data.platformWidth);
+      } else if (data.type === 'spider') {
+        monster = new SpiderMonster(this, data.x, data.y, data.platformWidth);
+      }
+      
+      if (monster) {
+        monster.create();
+        this.monsters.push(monster);
+        
+        // Add collision with platforms
+        this.physics.add.collider(monster.sprite, this.platforms);
+      }
+    }
+  }
+  
+  /**
+   * Create health UI showing player lives
+   */
+  createHealthUI() {
+    this.heartIcons = [];
+    const heartSize = 40;
+    const spacing = 45;
+    const startX = this.cameras.main.width - (this.playerMaxLives * spacing) - 10;
+    const startY = 60;
+    
+    for (let i = 0; i < this.playerMaxLives; i++) {
+      const heart = this.add.text(startX + (i * spacing), startY, '❤️', {
+        fontSize: '32px'
+      });
+      heart.setScrollFactor(0);
+      heart.setDepth(200);
+      this.heartIcons.push(heart);
+    }
+    
+    this.updateHealthUI();
+  }
+  
+  /**
+   * Update health UI to reflect current lives
+   */
+  updateHealthUI() {
+    for (let i = 0; i < this.heartIcons.length; i++) {
+      if (i < this.playerLives) {
+        this.heartIcons[i].setAlpha(1);
+      } else {
+        this.heartIcons[i].setAlpha(0.2);
+      }
+    }
+  }
+  
+  /**
+   * Shoot a projectile from player position
+   */
+  shootProjectile() {
+    const direction = this.player.flipX ? -1 : 1;
+    const offsetX = direction * 30; // Spawn bullet in front of player
+    
+    const projectile = new Projectile(
+      this,
+      this.player.x + offsetX,
+      this.player.y,
+      direction
+    );
+    projectile.create();
+    this.projectiles.push(projectile);
+  }
+  
+  /**
+   * Player takes damage
+   */
+  damagePlayer() {
+    if (this.invulnerable) return;
+    
+    this.playerLives--;
+    this.updateHealthUI();
+    
+    // Flash red
+    this.player.setTint(0xff0000);
+    
+    if (this.playerLives <= 0) {
+      // Game over - restart level
+      this.time.delayedCall(500, () => {
+        this.restartLevel();
+      });
+    } else {
+      // Invulnerability frames
+      this.invulnerable = true;
+      
+      // Flash effect
+      this.time.addEvent({
+        delay: 100,
+        repeat: 15,
+        callback: () => {
+          this.player.alpha = this.player.alpha === 1 ? 0.5 : 1;
+        }
+      });
+      
+      this.time.delayedCall(1500, () => {
+        this.invulnerable = false;
+        this.player.clearTint();
+        this.player.alpha = 1;
+      });
+    }
+  }
+  
+  /**
+   * Restart the current level - reset all progress
+   */
+  restartLevel() {
+    // Freeze player during restart
+    this.player.body.setVelocity(0, 0);
+    this.challengeActive = true;
+    
+    // Clean up challenge doors
+    if (this.challengeDoors) {
+      this.challengeDoors.forEach(cd => cd.destroy());
+      this.challengeDoors = [];
+    }
+    
+    // Destroy key sprite if it exists
+    if (this.keySprite) {
+      this.keySprite.destroy();
+      this.keySprite = null;
+    }
+    
+    // Clean up monsters
+    if (this.monsters) {
+      this.monsters.forEach(m => m.destroy());
+      this.monsters = [];
+    }
+    
+    // Clean up projectiles
+    if (this.projectiles) {
+      this.projectiles.forEach(p => p.destroy());
+      this.projectiles = [];
+    }
+    
+    // Reset player state
+    this.playerLives = this.playerMaxLives;
+    this.invulnerable = false;
+    this.player.clearTint();
+    this.player.alpha = 1;
+    
+    // Recreate challenge doors (fresh Challenge instances)
+    this.createChallengeDoors();
+    
+    // Recreate monsters
+    this.createMonsters();
+    
+    // Reset player position
+    const startPos = this.levelGeometry.getPlayerStartPosition();
+    this.player.x = startPos.x;
+    this.player.y = startPos.y;
+    this.player.body.setVelocity(0, 0);
+    this.player.anims.play('idle', true);
+    
+    // Re-enable controls
+    this.challengeActive = false;
+    
+    // Update UI
+    this.updateProgressUI();
+    this.updateHealthUI();
   }
 }
 

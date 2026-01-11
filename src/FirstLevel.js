@@ -180,5 +180,17 @@ export class FirstLevel extends LevelBuilder {
         }
       }
     ];
+
+    // Monsters - spawn op verschillende platforms
+    levelGeometry.monsters = [
+      // Slijm monsters (mortal) - kunnen doodgeschoten worden
+      { x: 350, y: 2050, type: 'slime', platformWidth: 500 },  // Op eerste grote platform
+      { x: 2000, y: 1350, type: 'slime', platformWidth: 500 }, // Op platform na teleporter
+      { x: 2800, y: 750, type: 'slime', platformWidth: 200 },  // Op platform voor eindconsole
+      
+      // Spin monsters (immortal) - kunnen niet dood
+      { x: 100, y: 1450, type: 'spider', platformWidth: 300 }, // Op platform na moeilijke sprong
+      { x: 2420, y: 200, type: 'spider', platformWidth: 200 }  // Op stairway to heaven
+    ];
   }
 }

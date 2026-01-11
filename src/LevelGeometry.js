@@ -12,6 +12,7 @@ export class LevelGeometry {
     this.floorTiles = [];
     this.teleporters = [];
     this.challengeDoors = [];  // Array van {x, y, challengeType, challengeData}
+    this.monsters = [];  // Array van {x, y, type: 'spider'|'slime', platformWidth}
   }
 
   getPlayerStartPosition() {
@@ -32,5 +33,9 @@ export class LevelGeometry {
 
   getChallengeDoors() {
     return this.challengeDoors;
+  }
+
+  getMonsters() {
+    return this.monsters;
   }
 }
