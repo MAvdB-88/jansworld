@@ -1151,8 +1151,8 @@ const config = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 3200,
-    height: 2400,
+    width: 1600,
+    height: 800,
     // Use window.innerHeight which accounts for mobile browser UI (nav bar)
     parent: document.body,
     expandParent: false

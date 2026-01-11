@@ -189,11 +189,11 @@ export class FirstLevel extends LevelBuilder {
       { x: 2800, y: 750, type: 'slime', platformWidth: 200 },  // Op platform voor eindconsole
       { x: 600, y: 830, type: 'slime', platformWidth: 100 },   // Op stairway platform
       { x: 2380, y: 1050, type: 'slime', platformWidth: 200 }, // Op klimsectie rechts
-      { x: 2140, y: 300, type: 'slime', platformWidth: 200 },  // Op stairway to heaven
+      { x: 2140, y: 300, type: 'slime', platformWidth: 140 },  // Op stairway to heaven (smaller patrol area)
       
       // Spin monsters (immortal) - kunnen niet dood
       { x: 100, y: 1450, type: 'spider', platformWidth: 300 }, // Op platform na moeilijke sprong
-      { x: 2420, y: 200, type: 'spider', platformWidth: 200 }  // Op stairway to heaven
+      { x: 2420, y: 200, type: 'spider', platformWidth: 140 }  // Op stairway to heaven (smaller patrol area)
     ];
   }
 }
