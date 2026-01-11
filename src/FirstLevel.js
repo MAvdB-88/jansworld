@@ -61,7 +61,7 @@ export class FirstLevel extends LevelBuilder {
       { x: 2280, y: 300, width: 200 },
       { x: 2420, y: 250, width: 200 },
       { x: 2560, y: 200, width: 200 },
-      { x: 2700, y: 150, width: 200 },
+      { x: 2700, y: 150, width: 200 }, 
       { x: 2800, y: 100, width: 200 },
     ];
 
