@@ -13,6 +13,15 @@ export class LevelGeometry {
     this.teleporters = [];
     this.challengeDoors = [];  // Array van {x, y, challengeType, challengeData}
     this.monsters = [];  // Array van {x, y, type: 'spider'|'slime', platformWidth}
+    this.tokens = []; // Array of tokens to collect
+  }
+
+  addToken(x, y) {
+    this.tokens.push({ x, y });
+  }
+
+  getTokens() {
+    return this.tokens;
   }
 
   getPlayerStartPosition() {

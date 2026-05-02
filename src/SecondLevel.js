@@ -15,17 +15,82 @@ export class SecondLevel extends LevelBuilder {
       });
     }
 
-    // TODO: Replace with real level 2 platform layout
+    levelGeometry.addToken(300, 2150); // Add token on the first platform
+    levelGeometry.addToken(500, 2150);
+    levelGeometry.addToken(700, 2150);
+    levelGeometry.addToken(900, 2150);
+    levelGeometry.addToken(1100, 2150);
+
+    levelGeometry.addToken(300, 1850); // Add token on the first platform
+    levelGeometry.addToken(500, 1850);
+    levelGeometry.addToken(700, 1850);
+    levelGeometry.addToken(900, 1850);
+    levelGeometry.addToken(1100, 1850);
+
+    levelGeometry.addToken(600, 1700);
+    levelGeometry.addToken(1000, 1700);
+
+    levelGeometry.addToken(500, 1550);
+    levelGeometry.addToken(900, 1550);
+
+    levelGeometry.addToken(600, 1400);
+    levelGeometry.addToken(1000, 1400);
+
+    // TODO: Replace with real level 2 monster placement
+    levelGeometry.monsters = [
+      { type: 'slime', x: 400, y: 2000, platformWidth: 70 },
+      { type: 'slime', x: 600, y: 2000, platformWidth: 70 },
+      { type: 'slime', x: 800, y: 2000, platformWidth: 70 },
+      { type: 'slime', x: 1000, y: 2000, platformWidth: 70 },
+      { type: 'slime', x: 400, y: 1700, platformWidth: 70 },
+      { type: 'slime', x: 800, y: 1700, platformWidth: 70 },
+      { type: 'slime', x: 700, y: 1550, platformWidth: 70 },
+      { type: 'slime', x: 1100, y: 1550, platformWidth: 70 },
+      { type: 'slime', x: 400, y: 1400, platformWidth: 70 },
+      { type: 'slime', x: 800, y: 1400, platformWidth: 70 },
+    ];
+
+
+
     levelGeometry.platforms = [
       // Starting area
-      { x: 300, y: 2100, width: 280 },
-      { x: 600, y: 1900, width: 210 },
-      { x: 900, y: 1700, width: 210 },
+      { x: 300, y: 2200, width: 70 },
+      { x: 500, y: 2200, width: 70 },
+      { x: 700, y: 2200, width: 70 },
+      { x: 900, y: 2200, width: 70 },
+      { x: 1100, y: 2200, width: 70 },
 
-      // Middle section
-      { x: 1200, y: 1500, width: 280 },
-      { x: 1500, y: 1300, width: 210 },
-      { x: 1800, y: 1100, width: 280 },
+      { x: 400, y: 2050, width: 70 },
+      { x: 600, y: 2050, width: 70 },
+      { x: 800, y: 2050, width: 70 },
+      { x: 1000, y: 2050, width: 70 },
+
+      { x: 300, y: 1900, width: 70 },
+      { x: 500, y: 1900, width: 70 },
+      { x: 700, y: 1900, width: 70 },
+      { x: 900, y: 1900, width: 70 },
+      { x: 1100, y: 1900, width: 70 },
+
+      { x: 400, y: 1750, width: 70 },
+      { x: 600, y: 1750, width: 70 },
+      { x: 800, y: 1750, width: 70 },
+      { x: 1000, y: 1750, width: 70 },
+
+      { x: 300, y: 1600, width: 70 },
+      { x: 500, y: 1600, width: 70 },
+      { x: 700, y: 1600, width: 70 },
+      { x: 900, y: 1600, width: 70 },
+      { x: 1100, y: 1600, width: 70 },
+
+      { x: 400, y: 1450, width: 70 },
+      { x: 600, y: 1450, width: 70 },
+      { x: 800, y: 1450, width: 70 },
+      { x: 1000, y: 1450, width: 70 },
+
+      // // Middle section
+      // { x: 1200, y: 1500, width: 280 },
+      // { x: 1500, y: 1300, width: 210 },
+      // { x: 1800, y: 1100, width: 280 },
 
       // Upper section
       { x: 2100, y: 900, width: 280 },
@@ -53,7 +118,7 @@ export class SecondLevel extends LevelBuilder {
     levelGeometry.challengeDoors = [
       {
         x: 300,
-        y: 2000, // On platform at y: 2100
+        y: 1500, // On platform at y: 2100
         challengeType: 'quiz',
         challengeData: {
           questions: [
@@ -107,11 +172,5 @@ export class SecondLevel extends LevelBuilder {
       }
     ];
 
-    // TODO: Replace with real level 2 monster placement
-    levelGeometry.monsters = [
-      { type: 'slime', x: 600, y: 1840, platformWidth: 210 },
-      { type: 'slime', x: 1200, y: 1440, platformWidth: 280 },
-      { type: 'spider', x: 2100, y: 840, platformWidth: 280 }
-    ];
   }
 }

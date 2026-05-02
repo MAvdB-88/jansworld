@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite",
     "dev:full": "wrangler pages dev --d1 DB=dcfd3307-6e26-40cb-853e-fd9d52dd3356 -- vite",
-    "db:init": "wrangler d1 execute DB --local --file=schema.sql",
-    "build": "vite build",
+    "db:init:local": "wrangler d1 execute jansworld-db --local --file=schema.sql -y",
+    "db:init:remote": "wrangler d1 execute jansworld-db --remote --file=schema.sql -y",
+    "build": "npm run db:init:remote && vite build",
     "preview": "vite preview"
   },
   "keywords": [],

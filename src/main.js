@@ -311,6 +311,7 @@ class GameScene extends Phaser.Scene {
     
     // Load key sprite
     this.load.image('keyYellow', 'sprites/Base pack/Items/keyYellow.png');
+    this.load.image('star', 'sprites/Base pack/Items/star.png');
     
     // Load monster sprites
     this.load.image('slimeWalk1', 'sprites/Extra animations and enemies/Enemy sprites/slimeGreen.png');
@@ -324,7 +325,8 @@ class GameScene extends Phaser.Scene {
 
   create() {
     // Read the level to play from scene start data
-    this.currentLevel = this.scene.settings.data?.level ?? 1;
+    // TEMPORARY DEV: Default to level 2
+    this.currentLevel = this.scene.settings.data?.level ?? 2;
 
     // Attach shared ProgressManager so LeaderboardManager can access it
     this.progressManager = progressManager;
@@ -414,6 +416,11 @@ class GameScene extends Phaser.Scene {
 
     // Add collision between player and platforms
     this.physics.add.collider(this.player, this.platforms);
+
+    // Overlap tokens
+    if (this.tokensGroup) {
+      this.physics.add.overlap(this.player, this.tokensGroup, this.collectToken, null, this);
+    }
 
     // Expand world bounds to allow camera scrolling
     const worldWidth = 3200;
@@ -803,7 +810,9 @@ class GameScene extends Phaser.Scene {
    */
   createChallengeDoors() {
     const challengeDoorData = this.levelGeometry.getChallengeDoors();
-    this.totalChallenges = challengeDoorData.length;
+    const tokenData = this.levelGeometry.getTokens ? this.levelGeometry.getTokens() : [];
+    
+    this.totalChallenges = challengeDoorData.length + tokenData.length;
     this.completedChallenges = 0;
     this.hasKey = false;
     
@@ -860,7 +869,21 @@ class GameScene extends Phaser.Scene {
       }
     }
     
-    // If no challenges, player starts with key
+    // Create tokens
+    this.tokensGroup = this.physics.add.group({ allowGravity: false, immovable: true });
+    for (const tokenData of (this.levelGeometry.getTokens ? this.levelGeometry.getTokens() : [])) {
+      const token = this.tokensGroup.create(tokenData.x, tokenData.y, 'star');
+      this.tweens.add({
+        targets: token,
+        y: token.y - 15,
+        duration: 1000,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+    }
+
+    // If no challenges and no tokens, player starts with key
     if (this.totalChallenges === 0) {
       this.hasKey = true;
     }
@@ -922,6 +945,28 @@ class GameScene extends Phaser.Scene {
     }
   }
   
+  collectToken(player, token) {
+    token.disableBody(true, true);
+    
+    // Add small visual effect
+    const scoreText = this.add.text(token.x, token.y - 20, '+1', {
+      fontSize: '20px',
+      fill: '#ffff00',
+      stroke: '#000000',
+      strokeThickness: 3
+    });
+    
+    this.tweens.add({
+      targets: scoreText,
+      y: scoreText.y - 30,
+      alpha: 0,
+      duration: 800,
+      onComplete: () => scoreText.destroy()
+    });
+
+    this.onChallengeCompleted();
+  }
+
   /**
    * Called when a challenge is completed
    */
@@ -1398,6 +1443,11 @@ class GameScene extends Phaser.Scene {
       this.challengeDoors.forEach(cd => cd.destroy());
       this.challengeDoors = [];
     }
+
+    // Clean up tokens
+    if (this.tokensGroup) {
+      this.tokensGroup.clear(true, true);
+    }
     
     // Destroy key sprite if it exists
     if (this.keySprite) {
@@ -1449,7 +1499,8 @@ class GameScene extends Phaser.Scene {
 const config = {
   type: Phaser.AUTO,
   backgroundColor: '#222222',
-  scene: [LoginScene, LevelSelectScene, GameScene],
+  // TEMPORARY DEV: Start GameScene immediately
+  scene: [GameScene, LoginScene, LevelSelectScene],
   physics: {
     default: 'arcade',
     arcade: {
