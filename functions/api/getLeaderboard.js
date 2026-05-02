@@ -7,11 +7,19 @@ export async function onRequestGet(context) {
     const { DB } = context.env;
     const url = new URL(context.request.url);
     const limit = parseInt(url.searchParams.get('limit') || '10');
+    const levelParam = url.searchParams.get('level');
+    const level = levelParam ? parseInt(levelParam) : null;
     
     // Get top scores ordered by completion time (fastest first)
-    const { results } = await DB.prepare(
-      'SELECT id, player_name, completion_time, created_at FROM leaderboard ORDER BY completion_time ASC LIMIT ?'
-    ).bind(limit).all();
+    let query, params;
+    if (level !== null && !isNaN(level)) {
+      query = 'SELECT id, player_name, completion_time, level, created_at FROM leaderboard WHERE level = ? ORDER BY completion_time ASC LIMIT ?';
+      params = [level, limit];
+    } else {
+      query = 'SELECT id, player_name, completion_time, level, created_at FROM leaderboard ORDER BY completion_time ASC LIMIT ?';
+      params = [limit];
+    }
+    const { results } = await DB.prepare(query).bind(...params).all();
     
     return new Response(JSON.stringify({ 
       success: true,

@@ -5,6 +5,8 @@
   "description": "Jan's World - A Super Mario Bros style browser game",
   "scripts": {
     "dev": "vite",
+    "dev:full": "wrangler pages dev --d1 DB=dcfd3307-6e26-40cb-853e-fd9d52dd3356 -- vite",
+    "db:init": "wrangler d1 execute DB --local --file=schema.sql",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -15,6 +17,7 @@
     "phaser": "^3.90.0"
   },
   "devDependencies": {
-    "vite": "^4.5.14"
+    "vite": "^4.5.14",
+    "wrangler": "^4.87.0"
   }
 }

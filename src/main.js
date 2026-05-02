@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { LevelGeometry } from './LevelGeometry.js';
 import { FirstLevel } from './FirstLevel.js';
+import { SecondLevel } from './SecondLevel.js';
 import { RandomLevelBuilder } from './RandomLevelBuilder.js';
 import { ChallengeDoor } from './entities/ChallengeDoor.js';
 import { QuizChallenge } from './challenges/QuizChallenge.js';
@@ -11,7 +12,281 @@ import { SpellingQuestion } from './challenges/questions/SpellingQuestion.js';
 import { SlimeMonster, SpiderMonster } from './entities/Monster.js';
 import { Projectile } from './entities/Projectile.js';
 import { LeaderboardManager } from './LeaderboardManager.js';
+import { ProgressManager } from './ProgressManager.js';
 
+// Shared ProgressManager instance
+const progressManager = new ProgressManager();
+
+// ---------------------------------------------------------------------------
+// LoginScene
+// ---------------------------------------------------------------------------
+class LoginScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'LoginScene' });
+  }
+
+  create() {
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
+
+    this.add.text(centerX, centerY - 240, "Jan's World", {
+      fontSize: '56px', fill: '#ffdd00', fontStyle: 'bold',
+      stroke: '#000000', strokeThickness: 5
+    }).setOrigin(0.5);
+
+    this.add.text(centerX, centerY - 170, 'Inloggen of registreren', {
+      fontSize: '28px', fill: '#ffffff'
+    }).setOrigin(0.5);
+
+    // If already logged in, skip straight to level select
+    if (progressManager.isLoggedIn()) {
+      this.scene.start('LevelSelectScene');
+      return;
+    }
+
+    this._buildLoginUI();
+  }
+
+  _buildLoginUI() {
+    const canvas = this.game.canvas;
+    const canvasRect = canvas.getBoundingClientRect();
+    const scaleX = canvasRect.width / this.cameras.main.width;
+    const scaleY = canvasRect.height / this.cameras.main.height;
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
+
+    // Container for all DOM elements so we can clean them up easily
+    this._domElements = [];
+
+    const mk = (tag, css, attrs = {}) => {
+      const el = document.createElement(tag);
+      el.style.cssText = css;
+      Object.assign(el, attrs);
+      document.body.appendChild(el);
+      this._domElements.push(el);
+      return el;
+    };
+
+    const toScreen = (gx, gy) => ({
+      left: `${canvasRect.left + gx * scaleX}px`,
+      top:  `${canvasRect.top  + gy * scaleY}px`,
+    });
+
+    const inputBase = `position:fixed;font-size:${Math.round(20 * scaleX)}px;` +
+      `padding:8px 10px;border:2px solid #6666ff;border-radius:5px;` +
+      `background:#222244;color:#ffffff;z-index:10000;box-sizing:border-box;` +
+      `width:${Math.round(320 * scaleX)}px;transform:translate(-50%,0);`;
+
+    // Username field
+    const namePos = toScreen(centerX, centerY - 90);
+    const nameInput = mk('input', inputBase + `left:${namePos.left};top:${namePos.top};`, {
+      type: 'text', placeholder: 'Gebruikersnaam', maxLength: 30
+    });
+
+    // Autocomplete dropdown
+    const dropPos = toScreen(centerX, centerY - 90 + Math.round(48 * scaleY));
+    const dropdown = mk('div',
+      `position:fixed;left:${dropPos.left};top:${dropPos.top};` +
+      `width:${Math.round(320 * scaleX)}px;transform:translateX(-50%);` +
+      `background:#333355;border:1px solid #6666ff;border-radius:0 0 5px 5px;` +
+      `z-index:10001;display:none;max-height:${Math.round(160 * scaleY)}px;overflow-y:auto;`
+    );
+
+    let searchTimeout = null;
+    nameInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      const q = nameInput.value.trim();
+      if (!q) { dropdown.style.display = 'none'; return; }
+      searchTimeout = setTimeout(async () => {
+        const names = await progressManager.searchPlayers(q);
+        dropdown.innerHTML = '';
+        if (names.length === 0) { dropdown.style.display = 'none'; return; }
+        names.forEach(name => {
+          const item = document.createElement('div');
+          item.textContent = name;
+          item.style.cssText = `padding:8px 12px;cursor:pointer;color:#ffffff;font-size:${Math.round(18 * scaleX)}px;`;
+          item.addEventListener('mouseenter', () => item.style.background = '#444477');
+          item.addEventListener('mouseleave', () => item.style.background = '');
+          item.addEventListener('mousedown', () => {
+            nameInput.value = name;
+            dropdown.style.display = 'none';
+          });
+          dropdown.appendChild(item);
+        });
+        dropdown.style.display = 'block';
+      }, 250);
+    });
+    nameInput.addEventListener('blur', () => setTimeout(() => { dropdown.style.display = 'none'; }, 150));
+
+    // Date of birth field
+    const dobPos = toScreen(centerX, centerY - 30);
+    const dobInput = mk('input', inputBase + `left:${dobPos.left};top:${dobPos.top};`, {
+      type: 'date'
+    });
+
+    // Error message
+    const errPos = toScreen(centerX, centerY + 30);
+    const errText = mk('div',
+      `position:fixed;left:${errPos.left};top:${errPos.top};transform:translateX(-50%);` +
+      `color:#ff6666;font-size:${Math.round(18 * scaleX)}px;text-align:center;z-index:10000;` +
+      `width:${Math.round(360 * scaleX)}px;min-height:${Math.round(28 * scaleY)}px;`
+    );
+
+    const btnBase = (bg) =>
+      `position:fixed;font-size:${Math.round(20 * scaleX)}px;padding:${Math.round(10 * scaleY)}px ${Math.round(24 * scaleX)}px;` +
+      `background:${bg};color:#ffffff;border:none;border-radius:6px;cursor:pointer;` +
+      `font-weight:bold;z-index:10000;transform:translateX(-50%);`;
+
+    // Login button
+    const loginPos = toScreen(centerX - 90, centerY + 80);
+    const loginBtn = mk('button', btnBase('#005500') + `left:${loginPos.left};top:${loginPos.top};`, {
+      textContent: 'Inloggen'
+    });
+
+    // Register button
+    const regPos = toScreen(centerX + 90, centerY + 80);
+    const regBtn = mk('button', btnBase('#335588') + `left:${regPos.left};top:${regPos.top};`, {
+      textContent: 'Nieuw account'
+    });
+
+    const getFields = () => ({
+      name: nameInput.value.trim(),
+      dob: dobInput.value
+    });
+
+    const validate = ({ name, dob }) => {
+      if (!name) { errText.textContent = 'Vul een gebruikersnaam in.'; return false; }
+      if (!dob)  { errText.textContent = 'Vul je geboortedatum in.'; return false; }
+      return true;
+    };
+
+    const proceed = () => {
+      this._removeDom();
+      this.scene.start('LevelSelectScene');
+    };
+
+    loginBtn.onclick = async () => {
+      const fields = getFields();
+      if (!validate(fields)) return;
+      loginBtn.disabled = true; loginBtn.textContent = 'Bezig...';
+      const result = await progressManager.login(fields.name, fields.dob);
+      if (result.success) {
+        proceed();
+      } else {
+        errText.textContent = result.error || 'Inloggen mislukt.';
+        loginBtn.disabled = false; loginBtn.textContent = 'Inloggen';
+      }
+    };
+
+    regBtn.onclick = async () => {
+      const fields = getFields();
+      if (!validate(fields)) return;
+      regBtn.disabled = true; regBtn.textContent = 'Bezig...';
+      const result = await progressManager.register(fields.name, fields.dob);
+      if (result.success) {
+        proceed();
+      } else {
+        errText.textContent = result.error || 'Registratie mislukt.';
+        regBtn.disabled = false; regBtn.textContent = 'Nieuw account';
+      }
+    };
+  }
+
+  _removeDom() {
+    if (this._domElements) {
+      this._domElements.forEach(el => { if (document.body.contains(el)) document.body.removeChild(el); });
+      this._domElements = [];
+    }
+  }
+
+  shutdown() {
+    this._removeDom();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// LevelSelectScene
+// ---------------------------------------------------------------------------
+const MAX_LEVELS = 2;
+
+class LevelSelectScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'LevelSelectScene' });
+  }
+
+  create() {
+    if (!progressManager.isLoggedIn()) {
+      this.scene.start('LoginScene');
+      return;
+    }
+
+    const w = this.cameras.main.width;
+    const h = this.cameras.main.height;
+    const cx = w / 2;
+
+    const name = progressManager.getPlayerName();
+    const highestLevel = progressManager.getHighestUnlockedLevel();
+
+    // Background
+    this.add.rectangle(cx, h / 2, w, h, 0x111122);
+
+    this.add.text(cx, 80, "Jan's World", {
+      fontSize: '56px', fill: '#ffdd00', fontStyle: 'bold',
+      stroke: '#000000', strokeThickness: 5
+    }).setOrigin(0.5);
+
+    this.add.text(cx, 155, `Welkom, ${name}!`, {
+      fontSize: '30px', fill: '#aaddff'
+    }).setOrigin(0.5);
+
+    this.add.text(cx, 220, 'Kies een level', {
+      fontSize: '26px', fill: '#ffffff'
+    }).setOrigin(0.5);
+
+    // Level buttons
+    const buttonY = 350;
+    const buttonSpacing = 220;
+    for (let lvl = 1; lvl <= MAX_LEVELS; lvl++) {
+      const bx = cx + (lvl - 1 - (MAX_LEVELS - 1) / 2) * buttonSpacing;
+      const unlocked = lvl <= highestLevel;
+      const color = unlocked ? 0x226622 : 0x333333;
+      const textColor = unlocked ? '#ffffff' : '#666666';
+
+      const btn = this.add.rectangle(bx, buttonY, 180, 180, color)
+        .setStrokeStyle(3, unlocked ? 0x44ff44 : 0x444444);
+
+      this.add.text(bx, buttonY - 30, `Level ${lvl}`, {
+        fontSize: '26px', fill: textColor, fontStyle: 'bold'
+      }).setOrigin(0.5);
+
+      this.add.text(bx, buttonY + 30, unlocked ? '▶ Spelen' : '🔒', {
+        fontSize: '22px', fill: textColor
+      }).setOrigin(0.5);
+
+      if (unlocked) {
+        btn.setInteractive({ useHandCursor: true });
+        btn.on('pointerover', () => btn.setFillStyle(0x338833));
+        btn.on('pointerout', () => btn.setFillStyle(0x226622));
+        btn.on('pointerdown', () => this.scene.start('GameScene', { level: lvl }));
+      }
+    }
+
+    // Logout link
+    const logoutText = this.add.text(w - 20, h - 20, 'Uitloggen', {
+      fontSize: '18px', fill: '#888888'
+    }).setOrigin(1, 1).setInteractive({ useHandCursor: true });
+    logoutText.on('pointerover', () => logoutText.setFill('#ffffff'));
+    logoutText.on('pointerout', () => logoutText.setFill('#888888'));
+    logoutText.on('pointerdown', () => {
+      progressManager.logout();
+      this.scene.start('LoginScene');
+    });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GameScene
+// ---------------------------------------------------------------------------
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
@@ -48,6 +323,12 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    // Read the level to play from scene start data
+    this.currentLevel = this.scene.settings.data?.level ?? 1;
+
+    // Attach shared ProgressManager so LeaderboardManager can access it
+    this.progressManager = progressManager;
+
     // Detect if mobile device
     this.isMobile = this.sys.game.device.os.android || 
                     this.sys.game.device.os.iOS || 
@@ -58,9 +339,10 @@ class GameScene extends Phaser.Scene {
     // Generate level
     this.levelGeometry = new LevelGeometry();
     
-    // Use FirstLevel for level 1, RandomLevelBuilder for subsequent levels
     if (this.currentLevel === 1) {
       this.levelBuilder = new FirstLevel(this);
+    } else if (this.currentLevel === 2) {
+      this.levelBuilder = new SecondLevel(this);
     } else {
       this.levelBuilder = new RandomLevelBuilder(this);
     }
@@ -198,19 +480,17 @@ class GameScene extends Phaser.Scene {
     
     // Initialize leaderboard manager and start timer
     this.leaderboardManager = new LeaderboardManager(this);
-    if (this.currentLevel === 1) {
-      this.leaderboardManager.startTimer();
-    }
+    this.leaderboardManager.startTimer();
   }
 
   nextLevel() {
-    // Stop timer and show leaderboard for level 1
-    if (this.currentLevel === 1 && this.leaderboardManager) {
+    // Unlock the next level in the player's progress
+    progressManager.unlockLevel(this.currentLevel + 1);
+
+    // Stop timer and show completion UI for this level
+    if (this.leaderboardManager) {
       this.leaderboardManager.stopTimer();
-      this.leaderboardManager.showCompletionUI();
-    } else {
-      // For future levels, show finished animation
-      this.showFinishedAnimation();
+      this.leaderboardManager.showCompletionUI(this.currentLevel);
     }
     return;
     
@@ -1169,7 +1449,7 @@ class GameScene extends Phaser.Scene {
 const config = {
   type: Phaser.AUTO,
   backgroundColor: '#222222',
-  scene: GameScene,
+  scene: [LoginScene, LevelSelectScene, GameScene],
   physics: {
     default: 'arcade',
     arcade: {

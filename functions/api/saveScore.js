@@ -22,7 +22,7 @@ export async function onRequestPost(context) {
     }
     const body = await context.request.json();
     
-    const { playerName, completionTime } = body;
+    const { playerName, completionTime, level } = body;
     
     // Validation
     if (!completionTime || typeof completionTime !== 'number') {
@@ -34,12 +34,15 @@ export async function onRequestPost(context) {
       });
     }
     
+    const levelNumber = (typeof level === 'number' && level >= 1) ? Math.floor(level) : 1;
+
     // Insert score into database
     const result = await DB.prepare(
-      'INSERT INTO leaderboard (player_name, completion_time) VALUES (?, ?)'
+      'INSERT INTO leaderboard (player_name, completion_time, level) VALUES (?, ?, ?)'
     ).bind(
       playerName || 'Anonymous',
-      Math.floor(completionTime)
+      Math.floor(completionTime),
+      levelNumber
     ).run();
     
     return new Response(JSON.stringify({ 
