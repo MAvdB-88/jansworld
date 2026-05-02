@@ -325,8 +325,7 @@ class GameScene extends Phaser.Scene {
 
   create() {
     // Read the level to play from scene start data
-    // TEMPORARY DEV: Default to level 2
-    this.currentLevel = this.scene.settings.data?.level ?? 2;
+    this.currentLevel = this.scene.settings.data?.level ?? 1;
 
     // Attach shared ProgressManager so LeaderboardManager can access it
     this.progressManager = progressManager;
@@ -1499,8 +1498,7 @@ class GameScene extends Phaser.Scene {
 const config = {
   type: Phaser.AUTO,
   backgroundColor: '#222222',
-  // TEMPORARY DEV: Start GameScene immediately
-  scene: [GameScene, LoginScene, LevelSelectScene],
+  scene: [LoginScene, LevelSelectScene, GameScene],
   physics: {
     default: 'arcade',
     arcade: {
