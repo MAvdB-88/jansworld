@@ -8,6 +8,8 @@ export class LevelGeometry {
     this.doorPlatformY = 120;
     this.startX = 100;
     this.startY = 2200;
+    this.keyX = 1600;
+    this.keyY = 2200;
     this.platforms = [];
     this.floorTiles = [];
     this.teleporters = [];
@@ -26,6 +28,10 @@ export class LevelGeometry {
 
   getPlayerStartPosition() {
     return { x: this.startX, y: this.startY };
+  }
+
+  getKeyPosition() {
+    return { x: this.keyX, y: this.keyY };
   }
 
   getDoorPosition() {

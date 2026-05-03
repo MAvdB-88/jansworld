@@ -74,6 +74,10 @@ export class FirstLevel extends LevelBuilder {
     levelGeometry.doorY = 25;
     levelGeometry.doorPlatformY = 120;
 
+    // Set key spawn position for first level
+    levelGeometry.keyX = 1400; // Middle-ish
+    levelGeometry.keyY = 400;
+
     // Teleporter positions - one-way teleportation
     levelGeometry.teleporters = [
       { x: 2920, y: 1260, type: 'from' }, // From: On platform at y: 1300

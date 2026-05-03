@@ -15,13 +15,18 @@ export class SecondLevel extends LevelBuilder {
       });
     }
 
-    levelGeometry.addToken(300, 2150); // Add token on the first platform
+    levelGeometry.addToken(300, 2150); 
     levelGeometry.addToken(500, 2150);
     levelGeometry.addToken(700, 2150);
     levelGeometry.addToken(900, 2150);
     levelGeometry.addToken(1100, 2150);
 
-    levelGeometry.addToken(300, 1850); // Add token on the first platform
+    levelGeometry.addToken(50, 1850); 
+    levelGeometry.addToken(100, 1850); 
+    levelGeometry.addToken(150, 1850); 
+    levelGeometry.addToken(200, 1850); 
+    levelGeometry.addToken(250, 1850); 
+    levelGeometry.addToken(300, 1850); 
     levelGeometry.addToken(500, 1850);
     levelGeometry.addToken(700, 1850);
     levelGeometry.addToken(900, 1850);
@@ -36,7 +41,6 @@ export class SecondLevel extends LevelBuilder {
     levelGeometry.addToken(600, 1400);
     levelGeometry.addToken(1000, 1400);
 
-    // TODO: Replace with real level 2 monster placement
     levelGeometry.monsters = [
       { type: 'slime', x: 400, y: 2000, platformWidth: 70 },
       { type: 'slime', x: 600, y: 2000, platformWidth: 70 },
@@ -49,8 +53,6 @@ export class SecondLevel extends LevelBuilder {
       { type: 'slime', x: 400, y: 1400, platformWidth: 70 },
       { type: 'slime', x: 800, y: 1400, platformWidth: 70 },
     ];
-
-
 
     levelGeometry.platforms = [
       // Starting area
@@ -65,7 +67,7 @@ export class SecondLevel extends LevelBuilder {
       { x: 800, y: 2050, width: 70 },
       { x: 1000, y: 2050, width: 70 },
 
-      { x: 300, y: 1900, width: 70 },
+      { x: 0, y: 1900, width: 670 },
       { x: 500, y: 1900, width: 70 },
       { x: 700, y: 1900, width: 70 },
       { x: 900, y: 1900, width: 70 },
@@ -87,83 +89,72 @@ export class SecondLevel extends LevelBuilder {
       { x: 800, y: 1450, width: 70 },
       { x: 1000, y: 1450, width: 70 },
 
-      // // Middle section
-      // { x: 1200, y: 1500, width: 280 },
-      // { x: 1500, y: 1300, width: 210 },
-      // { x: 1800, y: 1100, width: 280 },
-
-      // Upper section
-      { x: 2100, y: 900, width: 280 },
-      { x: 2400, y: 700, width: 210 },
-      { x: 2650, y: 500, width: 280 },
-
-      // Final approach to door
-      { x: 2800, y: 300, width: 280 },
-      { x: 2800, y: 100, width: 280 },
     ];
 
     // Player starts at bottom-left
     levelGeometry.startX = 50;
     levelGeometry.startY = 2200;
 
-    // Exit door at top-right
-    levelGeometry.doorX = 2800;
-    levelGeometry.doorY = 25;
+    levelGeometry.doorX = 50;
+    levelGeometry.doorY = 2000;
     levelGeometry.doorPlatformY = 100;
+
+    // Custom key spawn position for second level
+    levelGeometry.keyX = 1000;
+    levelGeometry.keyY = 1400; // Near upper platforms
 
     // No teleporters in placeholder
     levelGeometry.teleporters = [];
 
-    // TODO: Replace with real level 2 challenge questions
     levelGeometry.challengeDoors = [
       {
         x: 300,
-        y: 1500, // On platform at y: 2100
+        y: 1500,
         challengeType: 'quiz',
         challengeData: {
           questions: [
-            // TODO: Replace placeholder questions with real level 2 questions
             {
               type: 'multipleChoice',
-              question: '[PLACEHOLDER] Wat is 1 + 1?',
-              options: ['1', '2', '3', '4'],
-              correctIndex: 1
-            },
-            {
-              type: 'calculation',
-              question: '[PLACEHOLDER] Hoeveel is 5 × 5?',
-              answer: 25
-            },
-            {
-              type: 'multipleChoice',
-              question: '[PLACEHOLDER] Welke kleur heeft de lucht overdag?',
-              options: ['Rood', 'Groen', 'Blauw', 'Geel'],
+              question: 'Wat is het wereldrecord meeste wasknijpers in een baard?',
+              options: ['67', '195', '359', '423'],
               correctIndex: 2
+            },
+            {
+              type: 'multipleChoice',
+              question: 'Wie heeft het wereldrecord voor de langste nagels?',
+              options: ['Ayanna Williams', 'Christine Walton', 'Shirley Hughes', 'Annette Edwards'],
+              correctIndex: 0
+            },
+            {
+              type: 'multipleChoice',
+              question: 'Hoe lang waren de langste nagels ooit gemeten (bij elkaar)?',
+              options: ['469,23 cm', '733,55 cm', '1293,2 cm', '1500,5 cm'],
+              correctIndex: 1
             }
           ]
         }
       },
       {
-        x: 1800,
-        y: 1000, // On platform at y: 1100
+        x: 1450,
+        y: 1400, // On platform at y: 1100
         challengeType: 'quiz',
         challengeData: {
           questions: [
-            // TODO: Replace placeholder questions with real level 2 questions
             {
               type: 'multipleChoice',
-              question: '[PLACEHOLDER] Hoeveel dagen heeft een week?',
-              options: ['5', '6', '7', '8'],
-              correctIndex: 2
-            },
-            {
-              type: 'calculation',
-              question: '[PLACEHOLDER] Hoeveel is 10 - 3?',
-              answer: 7
+              question: 'Hoe lang is het langste mens ter wereld?',
+              options: ['251 cm', '272 cm', '235 cm', '290 cm'],
+              correctIndex: 0
             },
             {
               type: 'multipleChoice',
-              question: '[PLACEHOLDER] Wat is de grootste planeet in ons zonnestelsel?',
+              question: 'Hoe lang was het kortste mens ter wereld ooit gemeten?',
+              options: ['62,93 cm', '63,93 cm', '58,93 cm', '59,93 cm'],
+              correctIndex: 3
+            },
+            {
+              type: 'multipleChoice',
+              question: 'Wat is de grootste planeet in ons zonnestelsel?',
               options: ['Aarde', 'Mars', 'Jupiter', 'Saturnus'],
               correctIndex: 2
             }

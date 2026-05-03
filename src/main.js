@@ -984,8 +984,9 @@ class GameScene extends Phaser.Scene {
    * Spawn the key sprite in the level
    */
   spawnKey() {
-    const keyX = 1600;
-    const keyY = 2200; 
+    const keyPos = this.levelGeometry.getKeyPosition();
+    const keyX = keyPos.x;
+    const keyY = keyPos.y;
     
     // Create key sprite
     this.keySprite = this.physics.add.sprite(keyX, keyY, 'keyYellow');
